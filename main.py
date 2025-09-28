@@ -175,28 +175,39 @@ class GameFrame(tk.Frame):
         self.parent = parent
         game = parent.game
 
+        action_selection = tk.Frame(self)
+        action_selection.pack(side="top")
+
         self.rock_button = tk.Button(
             self, text=game.ROCK, command=lambda: self.play(game.ROCK)
-        ).pack(side="top", fill="x", pady=10)
+        ).pack(in_=action_selection, side="left", pady=10)
         self.paper_button = tk.Button(
-            self, text=game.PAPER, command=lambda: self.play(game.PAPER)
-        ).pack(side="top", fill="x", pady=10)
+            self,
+            text=game.PAPER,
+            command=lambda: self.play(game.PAPER),
+            # ).pack(side="top", fill="x", pady=10)
+        ).pack(in_=action_selection, side="left", pady=10)
         self.scissor_button = tk.Button(
             self,
             text=game.SCISSOR,
             command=lambda: self.play(game.SCISSOR),
-        ).pack(side="top", fill="x", pady=10)
+        ).pack(in_=action_selection, side="left", pady=10)
 
+        info = tk.Frame(self)
+        info.pack(side="top")
         self.info_text = tk.StringVar()
         self.info_text.set("Play either, 'Rock', 'Paper' or 'Scissor'")
 
         self.label = tk.Label(self, textvariable=self.info_text).pack(
-            side="top", fill="x", pady=10
+            in_=info, fill="x", pady=10
         )
 
-        self.display_result_button = tk.Button(
+        extra = tk.Frame(self)
+        extra.pack(side="bottom")
+
+        self.statistics_button = tk.Button(
             self, text="Show statistics", command=lambda: self.display_result()
-        ).pack(side="top", fill="x", pady=10)
+        ).pack(in_=extra, fill="x", pady=10)
 
         # TODO: Always plays last entry on self.play(option)
         # for option in OPTIONS:
@@ -204,7 +215,7 @@ class GameFrame(tk.Frame):
 
         self.goto_main_menu = tk.button = tk.Button(
             self, text="Give up", command=lambda: parent.switch_frame(MainMenu)
-        ).pack(side="top", fill="x", pady=10)
+        ).pack(in_=extra, fill="x", pady=10)
 
     def play(self, played):
         result = self.parent.game.play(played)
