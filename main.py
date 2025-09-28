@@ -16,11 +16,11 @@ RESULT = ["LOSS", "WIN", "DRAW"]
 # Game rules
 ROCK = "Rock"
 PAPER = "Paper"
-SCISSORS = "Scissors"
-OPTIONS = [ROCK, PAPER, SCISSORS]
+SCISSOR = "Scissors"
+OPTIONS = [ROCK, PAPER, SCISSOR]
 
 
-def game_rule(self, selection, opponent_selection):
+def game_rule(selection, opponent_selection):
     """
     The basic rules of rock paper scissors
     Rock beats Scissors
@@ -31,10 +31,10 @@ def game_rule(self, selection, opponent_selection):
         return DRAW
     elif (
         selection == ROCK
-        and opponent_selection == SCISSORS
+        and opponent_selection == SCISSOR
         or selection == PAPER
         and opponent_selection == ROCK
-        or selection == SCISSORS
+        or selection == SCISSOR
         and opponent_selection == PAPER
     ):
         return WIN
@@ -46,6 +46,7 @@ class RockPaperScissorGame(tk.Tk):
     HEIGHT = 400
     WIDTH = 400
     WINDOW_SIZE = str(HEIGHT) + "x" + str(WIDTH)
+    TITLE = "Sten sax påse"
 
     def __init__(self, *args, **kwargs):
         """
@@ -54,7 +55,7 @@ class RockPaperScissorGame(tk.Tk):
         """
         tk.Tk.__init__(self, *args, **kwargs)
         self.geometry(self.WINDOW_SIZE)
-        self.title("Sten sax påse")
+        self.title(self.TITLE)
 
         self.opponent = None
 
@@ -63,14 +64,27 @@ class RockPaperScissorGame(tk.Tk):
 
     def switch_frame(self, frame_class):
         """
-        Destroy the previous frame and all of its children.
-        Create a new frame with new frame in its place.
+        Destroys the current frame and all of its children.
+        Sets the current frame to the one supplied
         """
         new_frame = frame_class(self)
-        if self._frame is not None:
-            for widget in self._frame.winfo_children():
-                widget.destroy()
-            self._frame.destroy()
+        self._destroy_current_frame()
+        self._set_new_frame(new_frame)
+
+    def _destroy_current_frame(self):
+        """
+        Destroy current frame and all of its children.
+        """
+        if self._frame is None:
+            return
+        for widget in self._frame.winfo_children():
+            widget.destroy()
+        self._frame.destroy()
+
+    def _set_new_frame(self, new_frame):
+        """
+        Sets the current frame
+        """
         self._frame = new_frame
         new_frame.pack()
 
@@ -127,17 +141,25 @@ class Game(tk.Frame):
         self.opponent = parent.opponent
         self.results = [0, 0, 0]
 
-        self.rock_button = tk.button = tk.Button(
+        self.rock_button = tk.Button(
             self, text=ROCK, command=lambda: self.play(ROCK)
         ).pack(side="top", fill="x", pady=10)
-        self.paper_button = tk.button = tk.Button(
+        self.paper_button = tk.Button(
             self, text=PAPER, command=lambda: self.play(PAPER)
         ).pack(side="top", fill="x", pady=10)
-        self.scissor_button = tk.button = tk.Button(
+        self.scissor_button = tk.Button(
             self,
-            text=SCISSORS,
-            command=lambda: self.play(SCISSORS),
+            text=SCISSOR,
+            command=lambda: self.play(SCISSOR),
         ).pack(side="top", fill="x", pady=10)
+
+        self.display_result_button = tk.Button(
+            self, text="Show statistics", command=lambda: self.display_result()
+        ).pack(side="top", fill="x", pady=10)
+
+        # TODO: Always plays last entry on self.play(option)
+        # for option in OPTIONS:
+        # tk.Button( self, text=option, command=lambda: self.play(option), ).pack(side="top", fill="x", pady=10)
 
         self.goto_main_menu = tk.button = tk.Button(
             self, text="Give up", command=lambda: parent.switch_frame(MainMenu)
@@ -148,17 +170,12 @@ class Game(tk.Frame):
         result = game_rule(played, opponents_selection)
         self.results[result] += 1
 
-        print("You have played", played)
-        print("Your opponent has played: ", opponents_selection)
-        print("Result:", RESULT[result])
-        print(
-            "Number of wins: ",
-            self.results[WIN],
-            "Number of draws: ",
-            self.results[DRAW],
-            "Number of losses: ",
-            self.results[LOSS],
-        )
+        s = f"You have played {played} and you opponent {self.opponent} played {opponents_selection}. Its a {RESULT[result]}"
+        print(s)
+
+    def display_result(self):
+        result_string = f"{self.results[WIN]}/{self.results[LOSS]}/{self.results[DRAW]}"
+        print(result_string)
 
     def opponent_turn(self, played):
         if self.opponent == "Rocky":
