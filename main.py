@@ -23,6 +23,7 @@ class RockPaperScissorGame(tk.Tk):
 
         self._frame = None
 
+        self.opponent = None
         self.switch_frame(MainMenu)
 
     def switch_frame(self, frame_class):
@@ -38,6 +39,9 @@ class RockPaperScissorGame(tk.Tk):
         self._frame = new_frame
         new_frame.pack()
 
+    def switch_opponent(self, opponent):
+        self.opponent = opponent
+
 
 class MainMenu(tk.Frame):
     def __init__(self, parent):
@@ -45,13 +49,29 @@ class MainMenu(tk.Frame):
         self.label = tk.Label(self, text="Main menu").pack(
             side="top", fill="x", pady=10
         )
+        self._parent = parent
+
+        self.opponent_selection = tk.StringVar(value=OPPONENTS[0])
+
+        opponent_selection_label = tk.Label(self, text="Select an opponent")
+        opponent_selection_label.pack(pady=10)
+        opponent_selection_menu = tk.OptionMenu(
+            self, self.opponent_selection, *OPPONENTS
+        )
+        opponent_selection_menu.pack(pady=10)
 
         self.start_game = tk.Button(
-            self, text="Play", command=lambda: parent.switch_frame(Game)
+            self,
+            command=lambda: self.play_game(),
+            text="Play",
         ).pack(side="top", fill="x", pady=10)
         self.quit = tk.Button(self, text="Exit", command=lambda: parent.quit()).pack(
             side="top", fill="x", pady=10
         )
+
+    def play_game(self):
+        self._parent.opponent = self.opponent_selection.get()
+        self._parent.switch_frame(Game)
 
 
 class Game(tk.Frame):
@@ -90,8 +110,7 @@ class Game(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text="Game").pack(side="top", fill="x", pady=10)
-
-        self.OPPONENT = OPPONENTS[0]
+        self.opponent = parent.opponent
 
         self.rock_button = tk.button = tk.Button(
             self, text=self.ROCK, command=lambda: self.play(self.ROCK)
@@ -117,14 +136,14 @@ class Game(tk.Frame):
         print("Result:", self.RESULT[result])
 
     def opponent_turn(self, played):
-        if self.OPPONENT == "Rocky":
+        if self.opponent == "Rocky":
             return self.ROCK
             print("Your opponent has played: ", self.ROCK)
-        if self.OPPONENT == "Random":
+        if self.opponent == "Random":
             select = random.uniform(0, 3)
             option = self.OPTIONS[math.floor(select)]
             return option
-        if self.OPPONENT == "Reinhard":
+        if self.opponent == "Reinhard":
             select = random.uniform(0, 3)
             option = self.OPTIONS[math.floor(select)]
             cheat = self.game_rule(played, option)
