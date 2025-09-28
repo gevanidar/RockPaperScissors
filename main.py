@@ -5,6 +5,17 @@ import random
 SWEDISH = ["å", "ä", "ö", "Å", "Ä", "Ö"]  # Swedish letters
 
 OPPONENTS = ["Rocky", "Random", "Reinhard"]
+ROCK = "Rock"
+PAPER = "Paper"
+SCISSORS = "Scissors"
+
+OPTIONS = [ROCK, PAPER, SCISSORS]
+
+DRAW = 2
+WIN = 1
+LOSS = 0
+
+RESULT = ["LOSS", "WIN", "DRAW"]
 
 
 class RockPaperScissorGame(tk.Tk):
@@ -75,18 +86,6 @@ class MainMenu(tk.Frame):
 
 
 class Game(tk.Frame):
-    ROCK = "Rock"
-    PAPER = "Paper"
-    SCISSORS = "Scissors"
-
-    OPTIONS = [ROCK, PAPER, SCISSORS]
-
-    DRAW = 2
-    WIN = 1
-    LOSS = 0
-
-    RESULT = ["LOSS", "WIN", "DRAW"]
-
     def game_rule(self, selection, opponent_selection):
         """
         The basic rules of rock paper scissors
@@ -95,33 +94,34 @@ class Game(tk.Frame):
         Scissors beat Paper
         """
         if selection == opponent_selection:
-            return self.DRAW
+            return DRAW
         elif (
-            selection == self.ROCK
-            and opponent_selection == self.SCISSORS
-            or selection == self.PAPER
-            and opponent_selection == self.ROCK
-            or selection == self.SCISSORS
-            and opponent_selection == self.PAPER
+            selection == ROCK
+            and opponent_selection == SCISSORS
+            or selection == PAPER
+            and opponent_selection == ROCK
+            or selection == SCISSORS
+            and opponent_selection == PAPER
         ):
-            return self.WIN
-        return self.LOSS
+            return WIN
+        return LOSS
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text="Game").pack(side="top", fill="x", pady=10)
         self.opponent = parent.opponent
+        self.results = [0, 0, 0]
 
         self.rock_button = tk.button = tk.Button(
-            self, text=self.ROCK, command=lambda: self.play(self.ROCK)
+            self, text=ROCK, command=lambda: self.play(ROCK)
         ).pack(side="top", fill="x", pady=10)
         self.paper_button = tk.button = tk.Button(
-            self, text=self.PAPER, command=lambda: self.play(self.PAPER)
+            self, text=PAPER, command=lambda: self.play(PAPER)
         ).pack(side="top", fill="x", pady=10)
         self.scissor_button = tk.button = tk.Button(
             self,
-            text=self.SCISSORS,
-            command=lambda: self.play(self.SCISSORS),
+            text=SCISSORS,
+            command=lambda: self.play(SCISSORS),
         ).pack(side="top", fill="x", pady=10)
 
         self.goto_main_menu = tk.button = tk.Button(
@@ -133,23 +133,32 @@ class Game(tk.Frame):
         opponents_selection = self.opponent_turn(played)
         print("Your opponent has played: ", opponents_selection)
         result = self.game_rule(played, opponents_selection)
-        print("Result:", self.RESULT[result])
+        print("Result:", RESULT[result])
+        self.results[result] += 1
+        print(
+            "Number of wins: ",
+            self.results[WIN],
+            "Number of draws: ",
+            self.results[DRAW],
+            "Number of losses: ",
+            self.results[LOSS],
+        )
 
     def opponent_turn(self, played):
         if self.opponent == "Rocky":
-            return self.ROCK
-            print("Your opponent has played: ", self.ROCK)
+            return ROCK
+            print("Your opponent has played: ", ROCK)
         if self.opponent == "Random":
             select = random.uniform(0, 3)
-            option = self.OPTIONS[math.floor(select)]
+            option = OPTIONS[math.floor(select)]
             return option
         if self.opponent == "Reinhard":
             select = random.uniform(0, 3)
-            option = self.OPTIONS[math.floor(select)]
+            option = OPTIONS[math.floor(select)]
             cheat = self.game_rule(played, option)
-            if cheat == self.WIN:
+            if cheat == WIN:
                 select = random.uniform(0, 3)
-                option = self.OPTIONS[math.floor(select)]
+                option = OPTIONS[math.floor(select)]
             return option
 
 
