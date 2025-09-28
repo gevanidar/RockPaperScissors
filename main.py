@@ -35,8 +35,7 @@ class Game:
         result = self.game_rule(played, opponents_selection)
         self.results[result] += 1
 
-        s = f"You have played {played} and you opponent {self.opponent} played {opponents_selection}. Its a {RESULT[result]}"
-        print(s)
+        return f"You have played {played} and you opponent {self.opponent} played {opponents_selection}. Its a {RESULT[result]}"
 
     def opponent_turn(self, played):
         if self.get_opponent() == "Rocky":
@@ -188,6 +187,13 @@ class GameFrame(tk.Frame):
             command=lambda: self.play(game.SCISSOR),
         ).pack(side="top", fill="x", pady=10)
 
+        self.info_text = tk.StringVar()
+        self.info_text.set("Play either, 'Rock', 'Paper' or 'Scissor'")
+
+        self.label = tk.Label(self, textvariable=self.info_text).pack(
+            side="top", fill="x", pady=10
+        )
+
         self.display_result_button = tk.Button(
             self, text="Show statistics", command=lambda: self.display_result()
         ).pack(side="top", fill="x", pady=10)
@@ -201,12 +207,13 @@ class GameFrame(tk.Frame):
         ).pack(side="top", fill="x", pady=10)
 
     def play(self, played):
-        self.parent.game.play(played)
+        result = self.parent.game.play(played)
+        self.info_text.set(result)
 
     def display_result(self):
         results = self.parent.game.results
         result_string = f"{results[WIN]}/{results[LOSS]}/{results[DRAW]}"
-        print(result_string)
+        self.info_text.set(result_string)
 
 
 if __name__ == "__main__":
