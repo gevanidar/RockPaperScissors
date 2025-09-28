@@ -4,7 +4,10 @@ import random
 
 SWEDISH = ["å", "ä", "ö", "Å", "Ä", "Ö"]  # Swedish letters
 
-OPPONENTS = ["Rocky", "Random", "Reinhard"]
+ROCKY = "Rocky (Easy)"
+RANDOM = "Random (Medium)"
+REINHARD = "ReinHard (Hard)"
+OPPONENTS = [ROCKY, RANDOM, REINHARD]
 
 DRAW = 2
 WIN = 1
@@ -38,14 +41,14 @@ class Game:
         return f"You have played {played} and you opponent {self.opponent} played {opponents_selection}. Its a {RESULT[result]}"
 
     def opponent_turn(self, played):
-        if self.get_opponent() == "Rocky":
+        if self.get_opponent() == ROCKY:
             return self.ROCK
             print("Your opponent has played: ", self.ROCK)
-        if self.get_opponent() == "Random":
+        if self.get_opponent() == RANDOM:
             select = random.uniform(0, 3)
             option = self.OPTIONS[math.floor(select)]
             return option
-        if self.get_opponent() == "Reinhard":
+        if self.get_opponent() == REINHARD:
             select = random.uniform(0, 3)
             option = self.OPTIONS[math.floor(select)]
             cheat = self.game_rule(played, option)
