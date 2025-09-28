@@ -13,32 +13,68 @@ LOSS = 0
 RESULT = ["LOSS", "WIN", "DRAW"]
 
 
-# Game rules
-ROCK = "Rock"
-PAPER = "Paper"
-SCISSOR = "Scissors"
-OPTIONS = [ROCK, PAPER, SCISSOR]
+class Game:
+    # Game rules
+    ROCK = "Rock"
+    PAPER = "Paper"
+    SCISSOR = "Scissors"
+    OPTIONS = [ROCK, PAPER, SCISSOR]
 
+    def __init__(self):
+        self.results = [0, 0, 0]
+        self.opponent = None
 
-def game_rule(selection, opponent_selection):
-    """
-    The basic rules of rock paper scissors
-    Rock beats Scissors
-    Paper beats Rock
-    Scissors beat Paper
-    """
-    if selection == opponent_selection:
-        return DRAW
-    elif (
-        selection == ROCK
-        and opponent_selection == SCISSOR
-        or selection == PAPER
-        and opponent_selection == ROCK
-        or selection == SCISSOR
-        and opponent_selection == PAPER
-    ):
-        return WIN
-    return LOSS
+    def set_opponent(self, opponent):
+        self.opponent = opponent
+
+    def get_opponent(self):
+        return self.opponent
+
+    def play(self, played):
+        opponents_selection = self.opponent_turn(played)
+        result = self.game_rule(played, opponents_selection)
+        self.results[result] += 1
+
+        s = f"You have played {played} and you opponent {self.opponent} played {opponents_selection}. Its a {RESULT[result]}"
+        print(s)
+
+    def opponent_turn(self, played):
+        if self.get_opponent() == "Rocky":
+            return self.ROCK
+            print("Your opponent has played: ", self.ROCK)
+        if self.get_opponent() == "Random":
+            select = random.uniform(0, 3)
+            option = self.OPTIONS[math.floor(select)]
+            return option
+        if self.get_opponent() == "Reinhard":
+            select = random.uniform(0, 3)
+            option = self.OPTIONS[math.floor(select)]
+            cheat = self.game_rule(played, option)
+            if cheat == WIN:
+                # Reinhard cheats
+                select = random.uniform(0, 3)
+                option = self.OPTIONS[math.floor(select)]
+            return option
+
+    def game_rule(self, selection, opponent_selection):
+        """
+        The basic rules of rock paper scissors
+        Rock beats Scissors
+        Paper beats Rock
+        Scissors beat Paper
+        """
+        if selection == opponent_selection:
+            return DRAW
+        elif (
+            selection == self.ROCK
+            and opponent_selection == self.SCISSOR
+            or selection == self.PAPER
+            and opponent_selection == self.ROCK
+            or selection == self.SCISSOR
+            and opponent_selection == self.PAPER
+        ):
+            return WIN
+        return LOSS
 
 
 # Main window for game
@@ -57,8 +93,7 @@ class RockPaperScissorGame(tk.Tk):
         self.geometry(self.WINDOW_SIZE)
         self.title(self.TITLE)
 
-        self.opponent = None
-
+        self.game = Game()
         self._frame = None
         self.switch_frame(MainMenu)
 
@@ -92,7 +127,7 @@ class RockPaperScissorGame(tk.Tk):
         """
         Switch the current opponent a new one
         """
-        self.opponent = opponent
+        self.game.set_opponent(opponent)
 
 
 class MainMenu(tk.Frame):
@@ -130,27 +165,27 @@ class MainMenu(tk.Frame):
         """
         Set the current opponent and start the game
         """
-        self._parent.opponent = self.opponent_selection.get()
-        self._parent.switch_frame(Game)
+        self._parent.game.set_opponent(self.opponent_selection.get())
+        self._parent.switch_frame(GameFrame)
 
 
-class Game(tk.Frame):
+class GameFrame(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text="Game").pack(side="top", fill="x", pady=10)
-        self.opponent = parent.opponent
-        self.results = [0, 0, 0]
+        self.parent = parent
+        game = parent.game
 
         self.rock_button = tk.Button(
-            self, text=ROCK, command=lambda: self.play(ROCK)
+            self, text=game.ROCK, command=lambda: self.play(game.ROCK)
         ).pack(side="top", fill="x", pady=10)
         self.paper_button = tk.Button(
-            self, text=PAPER, command=lambda: self.play(PAPER)
+            self, text=game.PAPER, command=lambda: self.play(game.PAPER)
         ).pack(side="top", fill="x", pady=10)
         self.scissor_button = tk.Button(
             self,
-            text=SCISSOR,
-            command=lambda: self.play(SCISSOR),
+            text=game.SCISSOR,
+            command=lambda: self.play(game.SCISSOR),
         ).pack(side="top", fill="x", pady=10)
 
         self.display_result_button = tk.Button(
@@ -166,34 +201,12 @@ class Game(tk.Frame):
         ).pack(side="top", fill="x", pady=10)
 
     def play(self, played):
-        opponents_selection = self.opponent_turn(played)
-        result = game_rule(played, opponents_selection)
-        self.results[result] += 1
-
-        s = f"You have played {played} and you opponent {self.opponent} played {opponents_selection}. Its a {RESULT[result]}"
-        print(s)
+        self.parent.game.play(played)
 
     def display_result(self):
-        result_string = f"{self.results[WIN]}/{self.results[LOSS]}/{self.results[DRAW]}"
+        results = self.parent.game.results
+        result_string = f"{results[WIN]}/{results[LOSS]}/{results[DRAW]}"
         print(result_string)
-
-    def opponent_turn(self, played):
-        if self.opponent == "Rocky":
-            return ROCK
-            print("Your opponent has played: ", ROCK)
-        if self.opponent == "Random":
-            select = random.uniform(0, 3)
-            option = OPTIONS[math.floor(select)]
-            return option
-        if self.opponent == "Reinhard":
-            select = random.uniform(0, 3)
-            option = OPTIONS[math.floor(select)]
-            cheat = game_rule(played, option)
-            if cheat == WIN:
-                # Reinhard cheats
-                select = random.uniform(0, 3)
-                option = OPTIONS[math.floor(select)]
-            return option
 
 
 if __name__ == "__main__":
