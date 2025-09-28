@@ -4,15 +4,16 @@ import random
 
 SWEDISH = ["å", "ä", "ö", "Å", "Ä", "Ö"]  # Swedish letters
 
+# Opponents
 ROCKY = "Rocky (Easy)"
 RANDOM = "Random (Medium)"
 REINHARD = "ReinHard (Hard)"
 OPPONENTS = [ROCKY, RANDOM, REINHARD]
 
+# Game results
 DRAW = 2
 WIN = 1
 LOSS = 0
-
 RESULT = ["LOSS", "WIN", "DRAW"]
 
 
@@ -24,16 +25,28 @@ class Game:
     OPTIONS = [ROCK, PAPER, SCISSOR]
 
     def __init__(self):
+        """
+        Setup game
+        """
         self.results = [0, 0, 0]
         self.opponent = None
 
     def set_opponent(self, opponent):
+        """
+        Set the opponent
+
+        Parameters:
+        opponent (str): A valid opponent from the list `OPPONENTS`
+        """
         self.opponent = opponent
 
-    def get_opponent(self):
-        return self.opponent
-
     def play(self, played):
+        """
+        Play versus the opponent.
+
+        Parameters:
+        played (str): The players selection of `ROCK`, `PAPER` or `SCISSOR`
+        """
         opponents_selection = self.opponent_turn(played)
         result = self.game_rule(played, opponents_selection)
         self.results[result] += 1
@@ -41,14 +54,20 @@ class Game:
         return f"You have played {played} and you opponent {self.opponent} played {opponents_selection}. Its a {RESULT[result]}"
 
     def opponent_turn(self, played):
-        if self.get_opponent() == ROCKY:
+        """
+        Determine the opponents selection depending on the players 'played' selection.
+
+        Parameters:
+        played (str): The players selection of `ROCK`, `PAPER` or `SCISSOR`
+        """
+        if self.opponent == ROCKY:
             return self.ROCK
             print("Your opponent has played: ", self.ROCK)
-        if self.get_opponent() == RANDOM:
+        if self.opponent == RANDOM:
             select = random.uniform(0, 3)
             option = self.OPTIONS[math.floor(select)]
             return option
-        if self.get_opponent() == REINHARD:
+        if self.opponent == REINHARD:
             select = random.uniform(0, 3)
             option = self.OPTIONS[math.floor(select)]
             cheat = self.game_rule(played, option)
@@ -103,6 +122,9 @@ class RockPaperScissorGame(tk.Tk):
         """
         Destroys the current frame and all of its children.
         Sets the current frame to the one supplied
+
+        Parameters:
+        frame_class (tk.Frame): A tk.Frame class
         """
         new_frame = frame_class(self)
         self._destroy_current_frame()
@@ -121,19 +143,28 @@ class RockPaperScissorGame(tk.Tk):
     def _set_new_frame(self, new_frame):
         """
         Sets the current frame
+
+        Parameters:
+        new_frame (tk.Frame): A tk.Frame class
         """
         self._frame = new_frame
         new_frame.pack()
 
     def switch_opponent(self, opponent):
         """
-        Switch the current opponent a new one
+        Switch the current opponent a new one (wrapper for Game.set_opponent())
+
+        Parameters:
+        opponent (str): A valid opponent from the list `OPPONENTS`
         """
         self.game.set_opponent(opponent)
 
 
 class MainMenu(tk.Frame):
     def __init__(self, parent):
+        """
+        Setup the Main Menu frame
+        """
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text="Main menu").pack(
             side="top", fill="x", pady=10
@@ -173,6 +204,9 @@ class MainMenu(tk.Frame):
 
 class GameFrame(tk.Frame):
     def __init__(self, parent):
+        """
+        Setup the Game frame
+        """
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text="Game").pack(side="top", fill="x", pady=10)
         self.parent = parent
@@ -209,7 +243,7 @@ class GameFrame(tk.Frame):
         extra.pack(side="bottom")
 
         self.statistics_button = tk.Button(
-            self, text="Show statistics", command=lambda: self.display_result()
+            self, text="Show statistics", command=lambda: self.display_statistics()
         ).pack(in_=extra, fill="x", pady=10)
 
         # TODO: Always plays last entry on self.play(option)
@@ -221,12 +255,21 @@ class GameFrame(tk.Frame):
         ).pack(in_=extra, fill="x", pady=10)
 
     def play(self, played):
+        """
+        Use the played selection for playing the game.
+        Update the info text to display what the opponent did.
+        """
         result = self.parent.game.play(played)
         self.info_text.set(result)
 
-    def display_result(self):
+    def display_statistics(self):
+        """
+        Display the current WIN/LOSS/DRAW statistics
+        """
         results = self.parent.game.results
-        result_string = f"{results[WIN]}/{results[LOSS]}/{results[DRAW]}"
+        result_string = (
+            f"WINS: {results[WIN]} / LOSSES: {results[LOSS]}/ DRAWS: {results[DRAW]}"
+        )
         self.info_text.set(result_string)
 
 
