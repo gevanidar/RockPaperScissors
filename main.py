@@ -5,11 +5,6 @@ import random
 SWEDISH = ["å", "ä", "ö", "Å", "Ä", "Ö"]  # Swedish letters
 
 OPPONENTS = ["Rocky", "Random", "Reinhard"]
-ROCK = "Rock"
-PAPER = "Paper"
-SCISSORS = "Scissors"
-
-OPTIONS = [ROCK, PAPER, SCISSORS]
 
 DRAW = 2
 WIN = 1
@@ -18,6 +13,35 @@ LOSS = 0
 RESULT = ["LOSS", "WIN", "DRAW"]
 
 
+# Game rules
+ROCK = "Rock"
+PAPER = "Paper"
+SCISSORS = "Scissors"
+OPTIONS = [ROCK, PAPER, SCISSORS]
+
+
+def game_rule(self, selection, opponent_selection):
+    """
+    The basic rules of rock paper scissors
+    Rock beats Scissors
+    Paper beats Rock
+    Scissors beat Paper
+    """
+    if selection == opponent_selection:
+        return DRAW
+    elif (
+        selection == ROCK
+        and opponent_selection == SCISSORS
+        or selection == PAPER
+        and opponent_selection == ROCK
+        or selection == SCISSORS
+        and opponent_selection == PAPER
+    ):
+        return WIN
+    return LOSS
+
+
+# Main window for game
 class RockPaperScissorGame(tk.Tk):
     HEIGHT = 400
     WIDTH = 400
@@ -32,9 +56,9 @@ class RockPaperScissorGame(tk.Tk):
         self.geometry(self.WINDOW_SIZE)
         self.title("Sten sax påse")
 
-        self._frame = None
-
         self.opponent = None
+
+        self._frame = None
         self.switch_frame(MainMenu)
 
     def switch_frame(self, frame_class):
@@ -51,6 +75,9 @@ class RockPaperScissorGame(tk.Tk):
         new_frame.pack()
 
     def switch_opponent(self, opponent):
+        """
+        Switch the current opponent a new one
+        """
         self.opponent = opponent
 
 
@@ -63,13 +90,7 @@ class MainMenu(tk.Frame):
         self._parent = parent
 
         self.opponent_selection = tk.StringVar(value=OPPONENTS[0])
-
-        opponent_selection_label = tk.Label(self, text="Select an opponent")
-        opponent_selection_label.pack(pady=10)
-        opponent_selection_menu = tk.OptionMenu(
-            self, self.opponent_selection, *OPPONENTS
-        )
-        opponent_selection_menu.pack(pady=10)
+        self.setup_opponent_drop_down_menu()
 
         self.start_game = tk.Button(
             self,
@@ -80,32 +101,26 @@ class MainMenu(tk.Frame):
             side="top", fill="x", pady=10
         )
 
+    def setup_opponent_drop_down_menu(self):
+        """
+        Setup the opponent drop down menu
+        """
+        opponent_selection_label = tk.Label(self, text="Select an opponent")
+        opponent_selection_label.pack(pady=10)
+        opponent_selection_menu = tk.OptionMenu(
+            self, self.opponent_selection, *OPPONENTS
+        )
+        opponent_selection_menu.pack(pady=10)
+
     def play_game(self):
+        """
+        Set the current opponent and start the game
+        """
         self._parent.opponent = self.opponent_selection.get()
         self._parent.switch_frame(Game)
 
 
 class Game(tk.Frame):
-    def game_rule(self, selection, opponent_selection):
-        """
-        The basic rules of rock paper scissors
-        Rock beats Scissors
-        Paper beats Rock
-        Scissors beat Paper
-        """
-        if selection == opponent_selection:
-            return DRAW
-        elif (
-            selection == ROCK
-            and opponent_selection == SCISSORS
-            or selection == PAPER
-            and opponent_selection == ROCK
-            or selection == SCISSORS
-            and opponent_selection == PAPER
-        ):
-            return WIN
-        return LOSS
-
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text="Game").pack(side="top", fill="x", pady=10)
@@ -129,12 +144,13 @@ class Game(tk.Frame):
         ).pack(side="top", fill="x", pady=10)
 
     def play(self, played):
-        print("You have played", played)
         opponents_selection = self.opponent_turn(played)
-        print("Your opponent has played: ", opponents_selection)
-        result = self.game_rule(played, opponents_selection)
-        print("Result:", RESULT[result])
+        result = game_rule(played, opponents_selection)
         self.results[result] += 1
+
+        print("You have played", played)
+        print("Your opponent has played: ", opponents_selection)
+        print("Result:", RESULT[result])
         print(
             "Number of wins: ",
             self.results[WIN],
@@ -155,8 +171,9 @@ class Game(tk.Frame):
         if self.opponent == "Reinhard":
             select = random.uniform(0, 3)
             option = OPTIONS[math.floor(select)]
-            cheat = self.game_rule(played, option)
+            cheat = game_rule(played, option)
             if cheat == WIN:
+                # Reinhard cheats
                 select = random.uniform(0, 3)
                 option = OPTIONS[math.floor(select)]
             return option
