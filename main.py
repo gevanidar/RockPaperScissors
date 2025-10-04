@@ -51,7 +51,7 @@ class Game:
         result = self.game_rule(played, opponents_selection)
         self.results[result] += 1
 
-        return f"You have played {played} and you opponent {self.opponent} played {opponents_selection}. Its a {RESULT[result]}"
+        return f"You have played {played}.\nYour opponent {self.opponent} played {opponents_selection}.\n Its a {RESULT[result]}"
 
     def opponent_turn(self, played):
         """
@@ -268,7 +268,7 @@ class GameFrame(tk.Frame):
         """
         results = self.parent.game.results
         result_string = (
-            f"WINS: {results[WIN]} / LOSSES: {results[LOSS]}/ DRAWS: {results[DRAW]}"
+            f"WINS: {results[WIN]}\nLOSSES: {results[LOSS]}\nDRAWS: {results[DRAW]}"
         )
         self.info_text.set(result_string)
 
